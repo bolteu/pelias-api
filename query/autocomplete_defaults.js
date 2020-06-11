@@ -21,6 +21,15 @@ module.exports = _.merge({}, peliasQuery.defaults, {
   'ngram:boost': 100,
   'ngram:cutoff_frequency': 0.01,
 
+  'fuzzy:analyzer': 'peliasQuery',
+  'fuzzy:field': 'name.default',
+  'fuzzy:cutoff_frequency': 0.01,
+  'fuzzy:fuzziness': 'AUTO',
+  'fuzzy:boost': 1,
+  'fuzzy:prefix_length': 1,
+  'fuzzy:max_expansions': 10,
+  'fuzzy:operator': 'and',
+
   'phrase:analyzer': 'peliasQuery',
   'phrase:field': 'phrase.default',
   'phrase:boost': 1,

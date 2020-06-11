@@ -21,7 +21,7 @@ const defaults = new peliasQuery.Vars( require('../../../query/autocomplete_defa
 const views = {
   ngrams_last_token_only:     require('../../../query/view/ngrams_last_token_only'),
   ngrams_last_token_only_multi: require('../../../query/view/ngrams_last_token_only_multi')(adminFields),
-  phrase_first_tokens_only:   require('../../../query/view/phrase_first_tokens_only'),
+  phrase_first_tokens_only:   require('../../../query/view/phrase_first_tokens_only')(require('../../../query/view/fuzzy_match')),
 };
 
 module.exports.tests = {};

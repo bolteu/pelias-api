@@ -13,7 +13,7 @@ var views = {
   ngrams_last_token_only_multi: require('./view/ngrams_last_token_only_multi'),
   admin_multi_match_first: require('./view/admin_multi_match_first'),
   admin_multi_match_last: require('./view/admin_multi_match_last'),
-  phrase_first_tokens_only:   require('./view/phrase_first_tokens_only'),
+  phrase_first_tokens_only:   require('./view/phrase_first_tokens_only')(require('./view/fuzzy_match')),
   boost_exact_matches:        require('./view/boost_exact_matches'),
   max_character_count_layer_filter:   require('./view/max_character_count_layer_filter'),
   focus_point_filter:         require('./view/focus_point_distance_filter')
@@ -48,7 +48,7 @@ query.score( views.admin_multi_match_first( adminFields ), 'must');
 query.score( views.admin_multi_match_last( adminFields ), 'must');
 
 // address components
-query.score( peliasQuery.view.address('housenumber') );
+query.score( peliasQuery.view.address('housenumber'), 'must' );
 query.score( peliasQuery.view.address('street') );
 query.score( peliasQuery.view.address('cross_street') );
 query.score( peliasQuery.view.address('postcode') );

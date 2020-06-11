@@ -2,12 +2,16 @@ module.exports = {
   'query': {
     'bool': {
       'must': [{
-        'match_phrase': {
-          'phrase.default': {
+        'match': {
+          'name.default': {
             'analyzer': 'peliasQuery',
             'boost': 1,
-            'slop': 3,
-            'query': 'one'
+            'query': 'one',
+            'fuzziness': 'AUTO',
+            'prefix_length': 1,
+            'max_expansions': 10,
+            'operator': 'and',
+            'cutoff_frequency': 0.01
           }
         }
       }],
