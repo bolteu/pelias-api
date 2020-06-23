@@ -4,6 +4,8 @@ USER pelias
 
 # Where the app is built and run inside the docker fs
 ENV WORK=/home/pelias
+ENV PELIAS_CONFIG=pelias.json
+
 WORKDIR ${WORK}
 
 # copy package.json first to prevent npm install being rerun when only code changes
@@ -16,4 +18,4 @@ COPY . ${WORK}
 RUN npm test
 
 # start service
-CMD [ "./bin/start" ]
+CMD PELIAS_CONFIG=${PELIAS_CONFIG} npm run start
