@@ -13,15 +13,15 @@ var viewsExactMatch = {
   ngrams_last_token_only_multi: require('./view/ngrams_last_token_only_multi'),
   admin_multi_match_first: require('./view/admin_multi_match_first'),
   admin_multi_match_last: require('./view/admin_multi_match_last'),
-  phrase_first_tokens_only:   require('./view/phrase_first_tokens_only')(require('./view/exact_match')),
+  phrase_first_tokens_only:   require('./view/phrase_first_tokens_only'),
   boost_exact_matches:        require('./view/boost_exact_matches'),
   max_character_count_layer_filter:   require('./view/max_character_count_layer_filter'),
   focus_point_filter:         require('./view/focus_point_distance_filter')
 };
 
-var viewsFuzzyMatch = _.clone(viewsExactMatch);
+var viewsFuzzyMatch = _.cloneDeep(viewsExactMatch);
 viewsFuzzyMatch.ngrams_last_token_only = require('./view/ngrams_last_token_only_fuzzy');
-viewsFuzzyMatch.phrase_first_tokens_only = require('./view/phrase_first_tokens_only')(require('./view/fuzzy_match'));
+viewsFuzzyMatch.phrase_first_tokens_only = require('./view/phrase_first_tokens_only_fuzzy')(require('./view/fuzzy_match'));
 
 // add abbrevations for the fields pelias/parser is able to detect.
 var adminFields = placeTypes.concat(['locality_a', 'region_a', 'country_a']);
@@ -195,11 +195,12 @@ function generateQuery( clean ){
   if ( isAdminSet ){ vs.var('input:add_name_to_multimatch', 'enabled'); }
 
   var query;
-  // if (!_.isUndefined(clean['fuzziness'])) {
+  if (!_.isUndefined(clean.fuzziness)) {
     query = queryFuzzyMatch;
-  // } else {
-  //   query = queryExactMatch;
-  // }
+    vs.var('use_fuzzy', true);
+  } else {
+    query = queryExactMatch;
+  }
 
   var body = query.render(vs);
 

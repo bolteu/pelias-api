@@ -4,16 +4,12 @@ module.exports = {
       'must': [{
         'constant_score': {
           'filter': {
-            'match': {
+            'match_phrase': {
               'name.default': {
                 'analyzer': 'peliasQuery',
                 'boost': 100,
                 'query': 'test',
-                'fuzziness': 'AUTO',
-                'prefix_length': 1,
-                'max_expansions': 10,
-                'operator': 'and',
-                'cutoff_frequency': 0.01,
+                'slop': 3
               }
             }
           }
