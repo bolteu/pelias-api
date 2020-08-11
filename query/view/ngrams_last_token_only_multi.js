@@ -1,5 +1,5 @@
 const peliasQuery = require('pelias-query');
-const ngrams_last_token_only = require('./ngrams_last_token_only');
+const ngrams_last_token_only = require('./ngrams_last_token_only_fuzzy');
 
 module.exports = function (adminFields){
   const subview = peliasQuery.view.admin_multi_match( adminFields, 'peliasQuery' );

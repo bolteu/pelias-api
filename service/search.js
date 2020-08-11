@@ -12,6 +12,8 @@ function service( esclient, cmd, cb ){
 
   // query elasticsearch
   const startTime = new Date();
+  // logger.info(`cmd = ${JSON.stringify(cmd)}`);
+
   esclient.search( cmd, function( err, data ){
     if (data) {
       data.response_time = new Date() - startTime;

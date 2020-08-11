@@ -6,18 +6,22 @@ const config = require('pelias-config').generate();
 const placeTypes = require('../helper/placeTypes');
 
 // additional views (these may be merged in to pelias/query at a later date)
-var views = {
+var viewsExactMatch = {
   custom_boosts:              require('./view/boost_sources_and_layers'),
   ngrams_strict:              require('./view/ngrams_strict'),
   ngrams_last_token_only:     require('./view/ngrams_last_token_only'),
   ngrams_last_token_only_multi: require('./view/ngrams_last_token_only_multi'),
   admin_multi_match_first: require('./view/admin_multi_match_first'),
   admin_multi_match_last: require('./view/admin_multi_match_last'),
-  phrase_first_tokens_only:   require('./view/phrase_first_tokens_only')(require('./view/fuzzy_match')),
+  phrase_first_tokens_only:   require('./view/phrase_first_tokens_only')(require('./view/exact_match')),
   boost_exact_matches:        require('./view/boost_exact_matches'),
   max_character_count_layer_filter:   require('./view/max_character_count_layer_filter'),
   focus_point_filter:         require('./view/focus_point_distance_filter')
 };
+
+var viewsFuzzyMatch = _.clone(viewsExactMatch);
+viewsFuzzyMatch.ngrams_last_token_only = require('./view/ngrams_last_token_only_fuzzy');
+viewsFuzzyMatch.phrase_first_tokens_only = require('./view/phrase_first_tokens_only')(require('./view/fuzzy_match'));
 
 // add abbrevations for the fields pelias/parser is able to detect.
 var adminFields = placeTypes.concat(['locality_a', 'region_a', 'country_a']);
@@ -37,40 +41,47 @@ adminFields = adminFields.concat(['add_name_to_multimatch']);
 //------------------------------
 // autocomplete query
 //------------------------------
-var query = new peliasQuery.layout.FilteredBooleanQuery();
-
-// mandatory matches
-query.score( views.phrase_first_tokens_only, 'must' );
-query.score( views.ngrams_last_token_only_multi( adminFields ), 'must' );
-
-// admin components
-query.score( views.admin_multi_match_first( adminFields ), 'must');
-query.score( views.admin_multi_match_last( adminFields ), 'must');
-
-// address components
-query.score( peliasQuery.view.address('housenumber'), 'must' );
-query.score( peliasQuery.view.address('street') );
-query.score( peliasQuery.view.address('cross_street') );
-query.score( peliasQuery.view.address('postcode') );
-
-// scoring boost
-query.score( peliasQuery.view.focus( views.ngrams_strict ) );
-query.score( peliasQuery.view.popularity( peliasQuery.view.leaf.match_all ) );
-query.score( peliasQuery.view.population( peliasQuery.view.leaf.match_all ) );
-query.score( views.custom_boosts( config.get('api.customBoosts') ) );
-
-// non-scoring hard filters
-query.filter( views.max_character_count_layer_filter(['address'], config.get('api.autocomplete.exclude_address_length' ) ) );
-query.filter( peliasQuery.view.sources );
-query.filter( peliasQuery.view.layers );
-query.filter( peliasQuery.view.boundary_rect );
-query.filter( peliasQuery.view.boundary_circle );
-query.filter( peliasQuery.view.boundary_country );
-query.filter( peliasQuery.view.categories );
-query.filter( peliasQuery.view.boundary_gid );
-query.filter( views.focus_point_filter );
+var queryExactMatch = createQueryTemplate(viewsExactMatch);
+var queryFuzzyMatch = createQueryTemplate(viewsFuzzyMatch);
 
 // --------------------------------
+
+function createQueryTemplate( views ){
+  var query = new peliasQuery.layout.FilteredBooleanQuery();
+
+// mandatory matches
+  query.score( views.phrase_first_tokens_only, 'must' );
+  query.score( views.ngrams_last_token_only_multi( adminFields ), 'must' );
+
+// admin components
+  query.score( views.admin_multi_match_first( adminFields ), 'must');
+  query.score( views.admin_multi_match_last( adminFields ), 'must');
+
+// address components
+  query.score( peliasQuery.view.address('housenumber'));
+  query.score( peliasQuery.view.address('street') );
+  query.score( peliasQuery.view.address('cross_street') );
+  query.score( peliasQuery.view.address('postcode') );
+
+// scoring boost
+  query.score( peliasQuery.view.focus( views.ngrams_strict ) );
+  query.score( peliasQuery.view.popularity( peliasQuery.view.leaf.match_all ) );
+  query.score( peliasQuery.view.population( peliasQuery.view.leaf.match_all ) );
+  query.score( views.custom_boosts( config.get('api.customBoosts') ) );
+
+// non-scoring hard filters
+  query.filter( views.max_character_count_layer_filter(['address'], config.get('api.autocomplete.exclude_address_length' ) ) );
+  query.filter( peliasQuery.view.sources );
+  query.filter( peliasQuery.view.layers );
+  query.filter( peliasQuery.view.boundary_rect );
+  query.filter( peliasQuery.view.boundary_circle );
+  query.filter( peliasQuery.view.boundary_country );
+  query.filter( peliasQuery.view.categories );
+  query.filter( peliasQuery.view.boundary_gid );
+  query.filter( views.focus_point_filter );
+
+  return query;
+}
 
 /**
   map request variables to query variables for all inputs
@@ -183,9 +194,18 @@ function generateQuery( clean ){
   let isAdminSet = adminFields.some(field => vs.isset('input:' + field));
   if ( isAdminSet ){ vs.var('input:add_name_to_multimatch', 'enabled'); }
 
+  var query;
+  // if (!_.isUndefined(clean['fuzziness'])) {
+    query = queryFuzzyMatch;
+  // } else {
+  //   query = queryExactMatch;
+  // }
+
+  var body = query.render(vs);
+
   return {
     type: 'autocomplete',
-    body: query.render(vs)
+    body: body
   };
 }
 
