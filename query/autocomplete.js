@@ -198,15 +198,18 @@ function generateQuery( clean ){
   if (!_.isUndefined(clean.fuzziness)) {
     query = queryFuzzyMatch;
     vs.var('use_fuzzy', true);
+    vs.var('fuzzy:fuzziness', clean.fuzziness);
+
+    if (!_.isUndefined(clean.max_expansions)) {
+      vs.var('fuzzy:max_expansions', clean.max_expansions);
+    }
   } else {
     query = queryExactMatch;
   }
 
-  var body = query.render(vs);
-
   return {
     type: 'autocomplete',
-    body: body
+    body: query.render(vs)
   };
 }
 
