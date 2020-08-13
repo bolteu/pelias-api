@@ -9,9 +9,9 @@ module.exports = {
                                 'analyzer': 'peliasQuery',
                                 'boost': 100,
                                 'query': 'test',
-                                'fuzziness': 'AUTO',
+                                'fuzziness': 1,
                                 'prefix_length': 1,
-                                'max_expansions': 10,
+                                'max_expansions': 15,
                                 'cutoff_frequency': 0.01,
                                 'operator': 'and'
                             }
