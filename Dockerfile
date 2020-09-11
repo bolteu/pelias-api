@@ -4,7 +4,7 @@ USER pelias
 
 # Where the app is built and run inside the docker fs
 ENV WORK=/home/pelias
-ENV PELIAS_CONFIG=pelias.json
+ENV PELIAS_CONFIG=pelias-bolt.json
 
 WORKDIR ${WORK}
 
