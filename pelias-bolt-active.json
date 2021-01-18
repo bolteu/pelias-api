@@ -36,8 +36,7 @@
     },
     "targets": {	
       "layers_by_source": {	
-        "poi": ["address", "venue"],
-        "foursquare": ["address", "venue"]
+        "poi": ["address", "venue"]	
       }	
     }
   },
