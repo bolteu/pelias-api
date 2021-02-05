@@ -41,6 +41,19 @@ module.exports = {
       ],
       'should': [
         {
+          'multi_match': {
+            'type': 'phrase',
+            'query': 'one two',
+            'fields': [
+              'phrase.default',
+              'phrase.en'
+            ],
+            'analyzer': 'peliasQuery',
+            'boost': 1,
+            'slop': 3
+          }
+        },
+        {
           'function_score': {
             'query': {
               'match_all': {}

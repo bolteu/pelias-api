@@ -17,9 +17,9 @@ var views = {
   admin_multi_match_last: require('./view/admin_multi_match_last'),
   phrase_first_tokens_only:   require('./view/phrase_first_tokens_only'),
   boost_exact_matches:        require('./view/boost_exact_matches'),
+  boost_exact_matches_fuzzy:        require('./view/boost_exact_matches_fuzzy'),
   max_character_count_layer_filter:   require('./view/max_character_count_layer_filter'),
-  focus_point_filter:         require('./view/focus_point_distance_filter'),
-  proximity_boost:            require('./view/proximity_boost')
+  focus_point_filter:         require('./view/focus_point_distance_filter')
 };
 
 // add abbrevations for the fields pelias/parser is able to detect.
@@ -51,7 +51,8 @@ query.score( views.admin_multi_match_first( adminFields ), 'must');
 query.score( views.admin_multi_match_last( adminFields ), 'must');
 
 // scoring boost
-query.score( views.proximity_boost);
+query.score( views.boost_exact_matches_fuzzy );
+query.score( peliasQuery.view.focus( peliasQuery.view.leaf.match_all ) );
 query.score( peliasQuery.view.popularity( peliasQuery.view.leaf.match_all ) );
 query.score( peliasQuery.view.population( peliasQuery.view.leaf.match_all ) );
 query.score( views.custom_boosts( config.get('api.customBoosts') ) );

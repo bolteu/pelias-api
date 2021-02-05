@@ -21,14 +21,7 @@ module.exports = {
       'should': [{
         'function_score': {
           'query': {
-            'multi_match': {
-              'fields': ['name.default', 'name.en'],
-              'analyzer': 'peliasQuery',
-              'query': 'test',
-              'boost': 100,
-              'type': 'phrase',
-              'slop': 3
-            }
+            'match_all': {}
           },
           'functions': [{
             'exp': {

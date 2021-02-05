@@ -36,8 +36,19 @@ module.exports = {
           'type': 'cross_fields'
         }
       }],
-      'should':[
-        {
+      'should':[{
+        'multi_match': {
+          'type': 'phrase',
+          'query': 'k road',
+          'fields': [
+            'phrase.default',
+            'phrase.en'
+          ],
+          'analyzer': 'peliasQuery',
+          'boost': 1,
+          'slop': 3
+        }
+      },{
         'function_score': {
           'query': {
             'match_all': {}

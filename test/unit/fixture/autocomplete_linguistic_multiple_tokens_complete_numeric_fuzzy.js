@@ -33,6 +33,19 @@ module.exports = {
       }],
       'should': [
         {
+          'multi_match': {
+            'type': 'phrase',
+            'query': '1 2',
+            'fields': [
+              'phrase.default',
+              'phrase.en'
+            ],
+            'analyzer': 'peliasQuery',
+            'boost': 1,
+            'slop': 3
+          }
+        },
+        {
           'function_score': {
             'query': {
               'match_all': {}
